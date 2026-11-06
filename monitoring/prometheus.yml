@@ -1,0 +1,12 @@
+# Prometheus config for the docker compose stack in this repo.
+# k6 pushes metrics here over the remote write protocol, so no
+# scrape target is needed for the test itself; this job only
+# scrapes Prometheus for its own health.
+
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]

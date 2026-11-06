@@ -1,5 +1,6 @@
 import http from "k6/http";
 import { check } from "k6";
+import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.2/index.js";
 import { BASE_URL, HEADERS } from "../lib/config.js";
 
 // Smoke test: verify that the main endpoints respond correctly
@@ -39,4 +40,29 @@ export default function () {
     "create status is 201": (r) => r.status === 201,
     "create returns id": (r) => r.json("id"),
   });
+}
+
+// Custom summary: markdown table in the GitHub Actions run,
+// full JSON for the uploaded artifact, text summary on stdout locally.
+export function handleSummary(data) {
+  const m = data.metrics;
+  const md = [
+    "## k6 smoke test",
+    "",
+    "| Metric | Value |",
+    "|---|---|",
+    `| Checks | ${(m.checks.values.rate * 100).toFixed(1)}% |`,
+    `| HTTP errors | ${(m.http_req_failed.values.rate * 100).toFixed(1)}% |`,
+    `| p95 duration | ${(m.http_req_duration.values["p(95)"] / 1000).toFixed(2)} s |`,
+    `| Total requests | ${m.http_reqs.values.count} |`,
+  ].join("\n");
+
+  const out = {
+    "./results/smoke.json": JSON.stringify(data, null, 2),
+    stdout: textSummary(data, { indent: " ", enableColors: true }),
+  };
+  if (process.env.GITHUB_STEP_SUMMARY) {
+    out[process.env.GITHUB_STEP_SUMMARY] = { data: md };
+  }
+  return out;
 }

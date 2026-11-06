@@ -1,6 +1,6 @@
-# k6 portfolio project
+# k6-performance-lab
 
-Load testing scripts written for [Grafana k6](https://k6.io), run against the public [REQ|RES](https://reqres.in) test API. Built as practice and as a portfolio piece for performance testing work.
+Load testing scripts written for [Grafana k6](https://k6.io), run against the public [REQ|RES](https://reqres.in) test API. Built as practice and as a portfolio piece for performance testing work, by a Senior QA Engineer.
 
 ## The three scenarios
 
@@ -36,6 +36,30 @@ Both the target URL and the REQ|RES API key can be overridden with env vars:
 ```bash
 BASE_URL="https://other-api.example.com" REQRES_API_KEY="my-key" k6 run scripts/smoke.js
 ```
+
+## Watching a run live
+
+No extra setup needed: k6 ships a small dashboard you open in the browser while the test runs.
+
+```bash
+k6 run --out web-dashboard scripts/load.js
+# open http://localhost:5665/dashboard
+```
+
+For numbers that persist after the test ends, the same data can go to Prometheus and Grafana through the compose stack:
+
+```bash
+docker compose up -d
+K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write \
+  k6 run --out experimental-prometheus-rw scripts/load.js
+# Grafana at http://localhost:3000 (admin/admin), import dashboard ID 19665
+```
+
+The web dashboard path is also a good source of screenshots for a portfolio write-up.
+
+## Continuous integration
+
+The `k6 smoke` workflow runs the smoke script on every push, every pull request, and on a weekly schedule so the part that depends on a public API does not rot silently. Results land in the run's GitHub summary as a markdown table, and the full JSON goes to an artifact named `smoke-summary`.
 
 ## Notes
 
