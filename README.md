@@ -1,6 +1,6 @@
 # k6-performance-lab
 
-Load testing scripts written for [Grafana k6](https://k6.io), run against the public [REQ|RES](https://reqres.in) test API. Built as practice and as a portfolio piece for performance testing work, by a Senior QA Engineer.
+Load testing scripts for [Grafana k6](https://k6.io), run against the public [REQ|RES](https://reqres.in) test API. Three scenarios, each with checks and thresholds, plus a CI workflow and an optional Grafana stack.
 
 ## The three scenarios
 
@@ -10,7 +10,7 @@ Load testing scripts written for [Grafana k6](https://k6.io), run against the pu
 | `scripts/load.js` | Simulates normal traffic: ramp to 10 users, steady, ramp down | p95 under 800 ms, error rate under 1% |
 | `scripts/stress.js` | Pushes to 80 users to find the breaking point | error rate under 10% (relaxed on purpose) |
 
-Failures against the thresholds show up in the end-of-test summary with a red mark, so a run is easy to read at a glance.
+When a threshold fails, the end-of-test summary marks it red.
 
 ## Running
 
@@ -39,7 +39,7 @@ BASE_URL="https://other-api.example.com" REQRES_API_KEY="my-key" k6 run scripts/
 
 ## Watching a run live
 
-No extra setup needed: k6 ships a small dashboard you open in the browser while the test runs.
+k6 ships a web dashboard you open in the browser while the test runs.
 
 ```bash
 k6 run --out web-dashboard scripts/load.js
@@ -55,15 +55,13 @@ K6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write \
 # Grafana at http://localhost:3000 (admin/admin), import dashboard ID 19665
 ```
 
-The web dashboard path is also a good source of screenshots for a portfolio write-up.
-
 ## Continuous integration
 
-The `k6 smoke` workflow runs the smoke script on every push, every pull request, and on a weekly schedule so the part that depends on a public API does not rot silently. Results land in the run's GitHub summary as a markdown table, and the full JSON goes to an artifact named `smoke-summary`. k6 does not create the output directory itself, so the workflow makes one before running.
+The `k6 smoke` workflow runs the smoke script on every push, every pull request, and on a weekly schedule so the part that depends on a public API does not rot silently. Results land in the run's GitHub summary as a markdown table, and the full JSON goes to an artifact named `smoke-summary`. Since k6 does not create the output directory itself, the workflow makes one first.
 
 ## Notes
 
 - REQ|RES serves real responses for user list, single user, and create endpoints, but POST data is fake and nothing is stored. That makes it safe to hammer with a stress test.
 - The stress script is read-only, so a heavy run does not pile up test data.
 - The shared demo key has a daily request limit, so repeated runs can hit 429s late in the day. Register at reqres.in for a free personal key (250 requests per day) and set it as `REQRES_API_KEY` locally and as a GitHub Actions secret to keep runs clean.
-- When you attach results to a bug report or a portfolio write-up, include the error rate plus p95 and p99, not just the average.
+- When you attach results to a bug report, include the error rate plus p95 and p99, not just the average.

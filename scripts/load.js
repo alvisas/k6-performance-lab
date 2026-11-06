@@ -31,7 +31,7 @@ export default function () {
 
   const created = http.post(
     `${BASE_URL}/users`,
-    JSON.stringify({ name: "nebula", job: "portfolio tester" }),
+    JSON.stringify({ name: "nebula", job: "tester" }),
     { headers: HEADERS }
   );
   check(created, {
