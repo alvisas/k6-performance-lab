@@ -62,7 +62,7 @@ export function handleSummary(data) {
     stdout: textSummary(data, { indent: " ", enableColors: true }),
   };
   if (__ENV.GITHUB_STEP_SUMMARY) {
-    out[__ENV.GITHUB_STEP_SUMMARY] = { data: md };
+    out[__ENV.GITHUB_STEP_SUMMARY] = md;
   }
   return out;
 }
