@@ -1,7 +1,6 @@
-import http from "k6/http";
 import { check } from "k6";
 import { textSummary } from "https://jslib.k6.io/k6-summary/0.0.2/index.js";
-import { BASE_URL, HEADERS } from "../lib/config.js";
+import { listUsers, getUser, createUser } from "../lib/api.js";
 
 // Smoke test: verify that the main endpoints respond correctly
 // with minimal load. Run before anything else.
@@ -16,26 +15,19 @@ export const options = {
 };
 
 export default function () {
-  // GET list of users
-  const list = http.get(`${BASE_URL}/users?page=2`, { headers: HEADERS });
+  const list = listUsers(2);
   check(list, {
     "list status is 200": (r) => r.status === 200,
     "list has data array": (r) => Array.isArray(r.json("data")),
   });
 
-  // GET single user
-  const single = http.get(`${BASE_URL}/users/2`, { headers: HEADERS });
+  const single = getUser(2);
   check(single, {
     "single status is 200": (r) => r.status === 200,
     "single has email": (r) => r.json("data") && r.json("data").email,
   });
 
-  // POST create user
-  const created = http.post(
-    `${BASE_URL}/users`,
-    JSON.stringify({ name: "morpheus", job: "leader" }),
-    { headers: HEADERS }
-  );
+  const created = createUser("morpheus", "leader");
   check(created, {
     "create status is 201": (r) => r.status === 201,
     "create returns id": (r) => r.json("id"),

@@ -1,6 +1,5 @@
-import http from "k6/http";
 import { sleep } from "k6";
-import { BASE_URL, HEADERS } from "../lib/config.js";
+import { listUsers, getUser } from "../lib/api.js";
 
 // Stress test: keep pushing past normal load to find where
 // the service starts to break down. Read-only so the spike
@@ -17,15 +16,16 @@ export const options = {
   ],
   thresholds: {
     http_req_failed: ["rate<0.10"], // relaxed: we expect to find the limit
+    "http_req_duration{name:GET /users}": ["p(95)<1500"],
   },
 };
 
 export default function () {
   const page = Math.floor(Math.random() * 2) + 1;
-  http.get(`${BASE_URL}/users?page=${page}`, { headers: HEADERS });
+  listUsers(page);
 
   const user = Math.floor(Math.random() * 10) + 1;
-  http.get(`${BASE_URL}/users/${user}`, { headers: HEADERS });
+  getUser(user);
 
   sleep(0.5);
 }

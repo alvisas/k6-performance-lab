@@ -62,6 +62,7 @@ The `k6 smoke` workflow runs the smoke script on every push, every pull request,
 ## Notes
 
 - REQ|RES serves real responses for user list, single user, and create endpoints, but POST data is fake and nothing is stored. That makes it safe to hammer with a stress test.
+- Every request carries a `name` tag, so per-endpoint latency shows up as `http_req_duration{name=...}` in the metrics instead of one blended number.
 - The stress script is read-only, so a heavy run does not pile up test data.
 - The shared demo key has a daily request limit, so repeated runs can hit 429s late in the day. Register at reqres.in for a free personal key (250 requests per day) and set it as `REQRES_API_KEY` locally and as a GitHub Actions secret to keep runs clean.
 - When you attach results to a bug report, include the error rate plus p95 and p99, not just the average.
