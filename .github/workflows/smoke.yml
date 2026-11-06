@@ -17,7 +17,7 @@ jobs:
         uses: grafana/setup-k6-action@v1
 
       - name: Run smoke test
-        run: k6 run scripts/smoke.js
+        run: mkdir -p results && k6 run scripts/smoke.js
 
       - name: Upload summary
         if: always()

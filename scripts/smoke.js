@@ -61,8 +61,8 @@ export function handleSummary(data) {
     "./results/smoke.json": JSON.stringify(data, null, 2),
     stdout: textSummary(data, { indent: " ", enableColors: true }),
   };
-  if (process.env.GITHUB_STEP_SUMMARY) {
-    out[process.env.GITHUB_STEP_SUMMARY] = { data: md };
+  if (__ENV.GITHUB_STEP_SUMMARY) {
+    out[__ENV.GITHUB_STEP_SUMMARY] = { data: md };
   }
   return out;
 }

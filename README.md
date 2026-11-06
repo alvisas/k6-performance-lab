@@ -59,10 +59,11 @@ The web dashboard path is also a good source of screenshots for a portfolio writ
 
 ## Continuous integration
 
-The `k6 smoke` workflow runs the smoke script on every push, every pull request, and on a weekly schedule so the part that depends on a public API does not rot silently. Results land in the run's GitHub summary as a markdown table, and the full JSON goes to an artifact named `smoke-summary`.
+The `k6 smoke` workflow runs the smoke script on every push, every pull request, and on a weekly schedule so the part that depends on a public API does not rot silently. Results land in the run's GitHub summary as a markdown table, and the full JSON goes to an artifact named `smoke-summary`. k6 does not create the output directory itself, so the workflow makes one before running.
 
 ## Notes
 
 - REQ|RES serves real responses for user list, single user, and create endpoints, but POST data is fake and nothing is stored. That makes it safe to hammer with a stress test.
 - The stress script is read-only, so a heavy run does not pile up test data.
-When you attach results to a bug report or a portfolio write-up, include the error rate plus p95 and p99, not just the average.
+- The shared demo key has a daily request limit, so repeated runs can hit 429s late in the day. Register at reqres.in for a free personal key (250 requests per day) and set it as `REQRES_API_KEY` locally and as a GitHub Actions secret to keep runs clean.
+- When you attach results to a bug report or a portfolio write-up, include the error rate plus p95 and p99, not just the average.
